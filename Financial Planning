@@ -1,206 +1,285 @@
-import React, { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, DollarSign, Percent, Clock3 } from "lucide-react";
-
-export default function PaymentCalculatorWebsite() {
-  const [presentValue, setPresentValue] = useState("10000");
-  const [annualRate, setAnnualRate] = useState("5");
-  const [years, setYears] = useState("5");
-  const [paymentsPerYear, setPaymentsPerYear] = useState("12");
-  const [timeUnit, setTimeUnit] = useState("years");
-
-  const result = useMemo(() => {
-    const pv = parseFloat(presentValue);
-    const rate = parseFloat(annualRate) / 100;
-    const t = parseFloat(years);
-    const n = parseFloat(paymentsPerYear);
-
-    if ([pv, rate, t, n].some((value) => Number.isNaN(value) || value < 0)) {
-      return { payment: 0, totalPaid: 0, totalInterest: 0, valid: false };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
     }
 
-    const yearsValue = timeUnit === "months" ? t / 12 : t;
-    const totalPayments = yearsValue * n;
-
-    if (totalPayments === 0) {
-      return { payment: 0, totalPaid: 0, totalInterest: 0, valid: false };
+    body {
+      background: #f4f7fb;
+      color: #1f2937;
+      padding: 30px;
     }
 
-    // Loan/amortization payment formula:
-    // Payment = PV * [ r / (1 - (1 + r)^-N ) ]
-    // where r = periodic rate and N = total number of payments
-    if (rate === 0) {
-      const payment = pv / totalPayments;
-      const totalPaid = payment * totalPayments;
-      return {
-        payment,
-        totalPaid,
-        totalInterest: totalPaid - pv,
-        valid: true,
-      };
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    const periodicRate = rate / n;
-    const payment =
-      pv * (periodicRate / (1 - Math.pow(1 + periodicRate, -totalPayments)));
-    const totalPaid = payment * totalPayments;
-    const totalInterest = totalPaid - pv;
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
 
-    return { payment, totalPaid, totalInterest, valid: true };
-  }, [presentValue, annualRate, years, paymentsPerYear, timeUnit]);
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 30px;
+    }
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2,
-    }).format(value);
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
 
-  return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="rounded-2xl bg-white p-3 shadow-sm">
-            <Calculator className="h-6 w-6" />
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    .result-box {
+      background: #111827;
+      color: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .result-box small {
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .result-box .big {
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .mini-results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .mini-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .mini-card p:first-child {
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .mini-card p:last-child {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: #6b7280;
+      line-height: 1.5;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid,
+      .mini-results {
+        grid-template-columns: 1fr;
+      }
+
+      body {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Payment Calculator</h1>
+    <p class="subtitle">
+      Enter the current value, interest rate, and time to estimate the payment.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Inputs</h2>
+
+        <div class="field">
+          <label for="presentValue">Current Value / Loan Amount</label>
+          <input type="number" id="presentValue" value="10000" />
+        </div>
+
+        <div class="field">
+          <label for="interestRate">Interest Rate (%)</label>
+          <input type="number" id="interestRate" step="0.01" value="5" />
+        </div>
+
+        <div class="field">
+          <label for="rateUnit">Interest Rate Unit</label>
+          <select id="rateUnit">
+            <option value="annual" selected>Yearly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="timeValue">Time</label>
+          <input type="number" id="timeValue" step="0.1" value="5" />
+        </div>
+
+        <div class="field">
+          <label for="timeUnit">Time Unit</label>
+          <select id="timeUnit">
+            <option value="years" selected>Years</option>
+            <option value="months">Months</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="paymentsPerYear">Payment Frequency</label>
+          <select id="paymentsPerYear">
+            <option value="12" selected>Monthly (12)</option>
+            <option value="26">Biweekly (26)</option>
+            <option value="52">Weekly (52)</option>
+            <option value="4">Quarterly (4)</option>
+            <option value="1">Annually (1)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Results</h2>
+        <div class="result-box">
+          <small>Estimated Payment</small>
+          <div class="big" id="paymentResult">$0.00</div>
+        </div>
+
+        <div class="mini-results">
+          <div class="mini-card">
+            <p>Total Paid</p>
+            <p id="totalPaid">$0.00</p>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Payment Calculator</h1>
-            <p className="text-sm text-slate-600">
-              Enter your current value, interest rate, and time to estimate the required payment.
-            </p>
+          <div class="mini-card">
+            <p>Total Interest</p>
+            <p id="totalInterest">$0.00</p>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="rounded-2xl shadow-sm">
-            <CardHeader>
-              <CardTitle>Inputs</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="pv" className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Current Value / Loan Amount
-                </Label>
-                <Input
-                  id="pv"
-                  type="number"
-                  value={presentValue}
-                  onChange={(e) => setPresentValue(e.target.value)}
-                  placeholder="Enter amount"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="rate" className="flex items-center gap-2">
-                  <Percent className="h-4 w-4" />
-                  Annual Interest Rate (%)
-                </Label>
-                <Input
-                  id="rate"
-                  type="number"
-                  step="0.01"
-                  value={annualRate}
-                  onChange={(e) => setAnnualRate(e.target.value)}
-                  placeholder="Enter annual rate"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="years" className="flex items-center gap-2">
-                  <Clock3 className="h-4 w-4" />
-                  Time
-                </Label>
-                <Input
-                  id="years"
-                  type="number"
-                  step="0.1"
-                  value={years}
-                  onChange={(e) => setYears(e.target.value)}
-                  placeholder={timeUnit === "months" ? "Enter number of months" : "Enter number of years"}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Time Unit</Label>
-                <Select value={timeUnit} onValueChange={setTimeUnit}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select time unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="years">Years</SelectItem>
-                    <SelectItem value="months">Months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Payment Frequency</Label>
-                <Select value={paymentsPerYear} onValueChange={setPaymentsPerYear}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">Monthly (12)</SelectItem>
-                    <SelectItem value="26">Biweekly (26)</SelectItem>
-                    <SelectItem value="52">Weekly (52)</SelectItem>
-                    <SelectItem value="4">Quarterly (4)</SelectItem>
-                    <SelectItem value="1">Annually (1)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl shadow-sm">
-            <CardHeader>
-              <CardTitle>Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {result.valid ? (
-                <div className="space-y-4">
-                  <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-sm">
-                    <p className="text-sm uppercase tracking-wide text-slate-300">
-                      Estimated Payment
-                    </p>
-                    <p className="mt-2 text-4xl font-bold">
-                      {formatCurrency(result.payment)}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl border bg-white p-4">
-                      <p className="text-sm text-slate-500">Total Paid</p>
-                      <p className="mt-1 text-2xl font-semibold">
-                        {formatCurrency(result.totalPaid)}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border bg-white p-4">
-                      <p className="text-sm text-slate-500">Total Interest</p>
-                      <p className="mt-1 text-2xl font-semibold">
-                        {formatCurrency(result.totalInterest)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-dashed p-4 text-sm text-slate-600">
-                    This uses a standard amortization formula for loan-style payments. If you want,
-                    this can be changed to solve for future value, present value, or investment
-                    contribution payments instead.
-                  </div>
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed p-6 text-slate-500">
-                  Enter valid numbers greater than or equal to 0.
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        <div class="note">
+          This calculator uses a standard amortization formula for payment estimates.
+          It supports yearly or monthly interest entry and time entry in either years or months.
         </div>
       </div>
     </div>
-  );
-}
+  </div>
+
+  <script>
+    const presentValueInput = document.getElementById("presentValue");
+    const interestRateInput = document.getElementById("interestRate");
+    const rateUnitInput = document.getElementById("rateUnit");
+    const timeValueInput = document.getElementById("timeValue");
+    const timeUnitInput = document.getElementById("timeUnit");
+    const paymentsPerYearInput = document.getElementById("paymentsPerYear");
+
+    const paymentResult = document.getElementById("paymentResult");
+    const totalPaidResult = document.getElementById("totalPaid");
+    const totalInterestResult = document.getElementById("totalInterest");
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+      }).format(value);
+    }
+
+    function calculatePayment() {
+      const pv = parseFloat(presentValueInput.value) || 0;
+      const enteredRate = parseFloat(interestRateInput.value) || 0;
+      const rateUnit = rateUnitInput.value;
+      const timeValue = parseFloat(timeValueInput.value) || 0;
+      const timeUnit = timeUnitInput.value;
+      const paymentsPerYear = parseFloat(paymentsPerYearInput.value) || 12;
+
+      const years = timeUnit === "months" ? timeValue / 12 : timeValue;
+      const totalPayments = years * paymentsPerYear;
+
+      if (pv <= 0 || totalPayments <= 0) {
+        paymentResult.textContent = "$0.00";
+        totalPaidResult.textContent = "$0.00";
+        totalInterestResult.textContent = "$0.00";
+        return;
+      }
+
+      const annualRate = rateUnit === "monthly" ? enteredRate * 12 / 100 : enteredRate / 100;
+
+      let payment;
+      if (annualRate === 0) {
+        payment = pv / totalPayments;
+      } else {
+        const periodicRate = annualRate / paymentsPerYear;
+        payment = pv * (periodicRate / (1 - Math.pow(1 + periodicRate, -totalPayments)));
+      }
+
+      const totalPaid = payment * totalPayments;
+      const totalInterest = totalPaid - pv;
+
+      paymentResult.textContent = formatCurrency(payment);
+      totalPaidResult.textContent = formatCurrency(totalPaid);
+      totalInterestResult.textContent = formatCurrency(totalInterest);
+    }
+
+    [
+      presentValueInput,
+      interestRateInput,
+      rateUnitInput,
+      timeValueInput,
+      timeUnitInput,
+      paymentsPerYearInput
+    ].forEach((el) => el.addEventListener("input", calculatePayment));
+
+    calculatePayment();
+  </script>
+</body>
+</html>

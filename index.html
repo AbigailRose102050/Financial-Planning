@@ -33,6 +33,37 @@
       margin-bottom: 30px;
     }
 
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      border: none;
+      background: #e5e7eb;
+      color: #111827;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: #111827;
+      color: white;
+    }
+
+    .calculator-panel {
+      display: none;
+    }
+
+    .calculator-panel.active {
+      display: block;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -139,83 +170,181 @@
   <div class="container">
     <h1>Payment Calculator</h1>
     <p class="subtitle">
-      Enter the current value, interest rate, and time to estimate the payment.
+      Use the tabs below to switch between a payment calculator and a future value investment calculator.
     </p>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Inputs</h2>
+    <div class="tabs">
+      <button class="tab-button active" id="paymentTab">Payment Calculator</button>
+      <button class="tab-button" id="futureValueTab">Future Value Calculator</button>
+    </div>
 
-        <div class="field">
-          <label for="presentValue">Current Value / Loan Amount</label>
-          <input type="number" id="presentValue" value="10000" />
+    <div class="calculator-panel active" id="paymentPanel">
+      <div class="grid">
+        <div class="card">
+          <h2>Inputs</h2>
+
+          <div class="field">
+            <label for="presentValue">Current Value / Loan Amount</label>
+            <input type="number" id="presentValue" value="10000" />
+          </div>
+
+          <div class="field">
+            <label for="interestRate">Interest Rate (%)</label>
+            <input type="number" id="interestRate" step="0.01" value="5" />
+          </div>
+
+          <div class="field">
+            <label for="rateUnit">Interest Rate Unit</label>
+            <select id="rateUnit">
+              <option value="annual" selected>Yearly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="timeValue">Time</label>
+            <input type="number" id="timeValue" step="0.1" value="5" />
+          </div>
+
+          <div class="field">
+            <label for="timeUnit">Time Unit</label>
+            <select id="timeUnit">
+              <option value="years" selected>Years</option>
+              <option value="months">Months</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="paymentsPerYear">Payment Frequency</label>
+            <select id="paymentsPerYear">
+              <option value="12" selected>Monthly (12)</option>
+              <option value="26">Biweekly (26)</option>
+              <option value="52">Weekly (52)</option>
+              <option value="4">Quarterly (4)</option>
+              <option value="1">Annually (1)</option>
+            </select>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="interestRate">Interest Rate (%)</label>
-          <input type="number" id="interestRate" step="0.01" value="5" />
-        </div>
+        <div class="card">
+          <h2>Results</h2>
+          <div class="result-box">
+            <small>Estimated Payment</small>
+            <div class="big" id="paymentResult">$0.00</div>
+          </div>
 
-        <div class="field">
-          <label for="rateUnit">Interest Rate Unit</label>
-          <select id="rateUnit">
-            <option value="annual" selected>Yearly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
+          <div class="mini-results">
+            <div class="mini-card">
+              <p>Total Paid</p>
+              <p id="totalPaid">$0.00</p>
+            </div>
+            <div class="mini-card">
+              <p>Total Interest</p>
+              <p id="totalInterest">$0.00</p>
+            </div>
+          </div>
 
-        <div class="field">
-          <label for="timeValue">Time</label>
-          <input type="number" id="timeValue" step="0.1" value="5" />
-        </div>
-
-        <div class="field">
-          <label for="timeUnit">Time Unit</label>
-          <select id="timeUnit">
-            <option value="years" selected>Years</option>
-            <option value="months">Months</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="paymentsPerYear">Payment Frequency</label>
-          <select id="paymentsPerYear">
-            <option value="12" selected>Monthly (12)</option>
-            <option value="26">Biweekly (26)</option>
-            <option value="52">Weekly (52)</option>
-            <option value="4">Quarterly (4)</option>
-            <option value="1">Annually (1)</option>
-          </select>
+          <div class="note">
+            This calculator uses a standard amortization formula for payment estimates.
+            It supports yearly or monthly interest entry and time entry in either years or months.
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="card">
-        <h2>Results</h2>
-        <div class="result-box">
-          <small>Estimated Payment</small>
-          <div class="big" id="paymentResult">$0.00</div>
+    <div class="calculator-panel" id="futureValuePanel">
+      <div class="grid">
+        <div class="card">
+          <h2>Investment Inputs</h2>
+
+          <div class="field">
+            <label for="initialInvestment">Current Investment Value</label>
+            <input type="number" id="initialInvestment" value="10000" />
+          </div>
+
+          <div class="field">
+            <label for="monthlyContribution">Recurring Contribution</label>
+            <input type="number" id="monthlyContribution" value="200" />
+          </div>
+
+          <div class="field">
+            <label for="futureRate">Expected Interest Rate (%)</label>
+            <input type="number" id="futureRate" step="0.01" value="7" />
+          </div>
+
+          <div class="field">
+            <label for="futureRateUnit">Interest Rate Unit</label>
+            <select id="futureRateUnit">
+              <option value="annual" selected>Yearly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="futureTime">Time</label>
+            <input type="number" id="futureTime" step="0.1" value="10" />
+          </div>
+
+          <div class="field">
+            <label for="futureTimeUnit">Time Unit</label>
+            <select id="futureTimeUnit">
+              <option value="years" selected>Years</option>
+              <option value="months">Months</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="compoundFrequency">Compounding Frequency</label>
+            <select id="compoundFrequency">
+              <option value="12" selected>Monthly (12)</option>
+              <option value="4">Quarterly (4)</option>
+              <option value="1">Annually (1)</option>
+              <option value="365">Daily (365)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="contributionTiming">Contribution Timing</label>
+            <select id="contributionTiming">
+              <option value="end" selected>End of Period</option>
+              <option value="beginning">Beginning of Period</option>
+            </select>
+          </div>
         </div>
 
-        <div class="mini-results">
-          <div class="mini-card">
-            <p>Total Paid</p>
-            <p id="totalPaid">$0.00</p>
+        <div class="card">
+          <h2>Future Value Results</h2>
+          <div class="result-box">
+            <small>Projected Future Value</small>
+            <div class="big" id="futureValueResult">$0.00</div>
           </div>
-          <div class="mini-card">
-            <p>Total Interest</p>
-            <p id="totalInterest">$0.00</p>
-          </div>
-        </div>
 
-        <div class="note">
-          This calculator uses a standard amortization formula for payment estimates.
-          It supports yearly or monthly interest entry and time entry in either years or months.
+          <div class="mini-results">
+            <div class="mini-card">
+              <p>Total Contributions</p>
+              <p id="totalContributions">$0.00</p>
+            </div>
+            <div class="mini-card">
+              <p>Investment Growth</p>
+              <p id="investmentGrowth">$0.00</p>
+            </div>
+          </div>
+
+          <div class="note">
+            This calculator estimates how much your investment could grow based on an initial amount,
+            recurring monthly contributions, interest rate, and compounding frequency.
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    const paymentTab = document.getElementById("paymentTab");
+    const futureValueTab = document.getElementById("futureValueTab");
+    const paymentPanel = document.getElementById("paymentPanel");
+    const futureValuePanel = document.getElementById("futureValuePanel");
+
     const presentValueInput = document.getElementById("presentValue");
     const interestRateInput = document.getElementById("interestRate");
     const rateUnitInput = document.getElementById("rateUnit");
@@ -227,12 +356,42 @@
     const totalPaidResult = document.getElementById("totalPaid");
     const totalInterestResult = document.getElementById("totalInterest");
 
+    const initialInvestmentInput = document.getElementById("initialInvestment");
+    const monthlyContributionInput = document.getElementById("monthlyContribution");
+    const futureRateInput = document.getElementById("futureRate");
+    const futureRateUnitInput = document.getElementById("futureRateUnit");
+    const futureTimeInput = document.getElementById("futureTime");
+    const futureTimeUnitInput = document.getElementById("futureTimeUnit");
+    const compoundFrequencyInput = document.getElementById("compoundFrequency");
+    const contributionTimingInput = document.getElementById("contributionTiming");
+
+    const futureValueResult = document.getElementById("futureValueResult");
+    const totalContributionsResult = document.getElementById("totalContributions");
+    const investmentGrowthResult = document.getElementById("investmentGrowth");
+
     function formatCurrency(value) {
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD"
       }).format(value);
     }
+
+    function showTab(tabName) {
+      if (tabName === "payment") {
+        paymentTab.classList.add("active");
+        futureValueTab.classList.remove("active");
+        paymentPanel.classList.add("active");
+        futureValuePanel.classList.remove("active");
+      } else {
+        futureValueTab.classList.add("active");
+        paymentTab.classList.remove("active");
+        futureValuePanel.classList.add("active");
+        paymentPanel.classList.remove("active");
+      }
+    }
+
+    paymentTab.addEventListener("click", () => showTab("payment"));
+    futureValueTab.addEventListener("click", () => showTab("futureValue"));
 
     function calculatePayment() {
       const pv = parseFloat(presentValueInput.value) || 0;
@@ -270,6 +429,53 @@
       totalInterestResult.textContent = formatCurrency(totalInterest);
     }
 
+    function calculateFutureValue() {
+      const initialInvestment = parseFloat(initialInvestmentInput.value) || 0;
+      const contribution = parseFloat(monthlyContributionInput.value) || 0;
+      const enteredRate = parseFloat(futureRateInput.value) || 0;
+      const rateUnit = futureRateUnitInput.value;
+      const futureTime = parseFloat(futureTimeInput.value) || 0;
+      const timeUnit = futureTimeUnitInput.value;
+      const compoundFrequency = parseFloat(compoundFrequencyInput.value) || 12;
+      const contributionTiming = contributionTimingInput.value;
+
+      const years = timeUnit === "months" ? futureTime / 12 : futureTime;
+      const periods = years * compoundFrequency;
+
+      if (years <= 0 || compoundFrequency <= 0) {
+        futureValueResult.textContent = "$0.00";
+        totalContributionsResult.textContent = formatCurrency(initialInvestment);
+        investmentGrowthResult.textContent = "$0.00";
+        return;
+      }
+
+      const annualRate = rateUnit === "monthly" ? enteredRate * 12 / 100 : enteredRate / 100;
+      const periodicRate = annualRate / compoundFrequency;
+
+      let futureValueInitial = initialInvestment;
+      let futureValueContributions = 0;
+
+      if (annualRate === 0) {
+        futureValueInitial = initialInvestment;
+        futureValueContributions = contribution * periods;
+      } else {
+        futureValueInitial = initialInvestment * Math.pow(1 + periodicRate, periods);
+        futureValueContributions = contribution * ((Math.pow(1 + periodicRate, periods) - 1) / periodicRate);
+
+        if (contributionTiming === "beginning") {
+          futureValueContributions *= (1 + periodicRate);
+        }
+      }
+
+      const futureValue = futureValueInitial + futureValueContributions;
+      const totalContributions = initialInvestment + contribution * periods;
+      const growth = futureValue - totalContributions;
+
+      futureValueResult.textContent = formatCurrency(futureValue);
+      totalContributionsResult.textContent = formatCurrency(totalContributions);
+      investmentGrowthResult.textContent = formatCurrency(growth);
+    }
+
     [
       presentValueInput,
       interestRateInput,
@@ -279,7 +485,19 @@
       paymentsPerYearInput
     ].forEach((el) => el.addEventListener("input", calculatePayment));
 
+    [
+      initialInvestmentInput,
+      monthlyContributionInput,
+      futureRateInput,
+      futureRateUnitInput,
+      futureTimeInput,
+      futureTimeUnitInput,
+      compoundFrequencyInput,
+      contributionTimingInput
+    ].forEach((el) => el.addEventListener("input", calculateFutureValue));
+
     calculatePayment();
+    calculateFutureValue();
   </script>
 </body>
 </html>

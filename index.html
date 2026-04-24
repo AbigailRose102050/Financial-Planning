@@ -9,77 +9,116 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
     }
 
     body {
-      background: #f4f7fb;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 183, 197, 0.9), transparent 32%),
+        radial-gradient(circle at top right, rgba(144, 205, 244, 0.9), transparent 35%),
+        linear-gradient(135deg, #fdf2f8 0%, #eef2ff 45%, #ecfeff 100%);
       color: #1f2937;
-      padding: 30px;
+      padding: 34px;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1050px;
       margin: 0 auto;
     }
 
     h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      margin-bottom: 12px;
+      color: #111827;
+      letter-spacing: -0.05em;
+      line-height: 1;
     }
 
     .subtitle {
-      color: #6b7280;
+      color: #4b5563;
       margin-bottom: 30px;
+      font-size: 1.08rem;
+      max-width: 700px;
+      line-height: 1.6;
     }
 
     .tabs {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 26px;
       flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      padding: 10px;
+      border-radius: 999px;
+      width: fit-content;
+      box-shadow: 0 18px 40px rgba(79, 70, 229, 0.12);
+      backdrop-filter: blur(14px);
     }
 
     .tab-button {
       border: none;
-      background: #e5e7eb;
-      color: #111827;
-      padding: 12px 18px;
+      background: transparent;
+      color: #4b5563;
+      padding: 13px 20px;
       border-radius: 999px;
       font-size: 0.95rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-button:hover {
+      transform: translateY(-1px);
+      color: #111827;
     }
 
     .tab-button.active {
-      background: #111827;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
       color: white;
+      box-shadow: 0 12px 25px rgba(236, 72, 153, 0.28);
     }
 
     .calculator-panel {
       display: none;
+      animation: fadeIn 0.35s ease;
     }
 
     .calculator-panel.active {
       display: block;
     }
 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 24px;
     }
 
     .card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 24px 55px rgba(31, 41, 55, 0.13);
+      backdrop-filter: blur(18px);
     }
 
     .card h2 {
-      margin-bottom: 20px;
-      font-size: 1.25rem;
+      margin-bottom: 22px;
+      font-size: 1.35rem;
+      color: #111827;
     }
 
     .field {
@@ -89,36 +128,69 @@
     label {
       display: block;
       margin-bottom: 8px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #374151;
+      font-size: 0.92rem;
     }
 
     input,
     select {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
+      padding: 14px 15px;
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
       font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: #111827;
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+      background: white;
     }
 
     .result-box {
-      background: #111827;
+      background: linear-gradient(135deg, #0f172a, #4338ca 45%, #db2777);
       color: white;
-      padding: 24px;
-      border-radius: 16px;
+      padding: 30px;
+      border-radius: 26px;
       margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 35px rgba(67, 56, 202, 0.28);
+    }
+
+    .result-box::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -55px;
+      top: -55px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
     }
 
     .result-box small {
-      color: #cbd5e1;
+      color: #e0e7ff;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
     }
 
     .result-box .big {
-      font-size: 2.2rem;
-      font-weight: bold;
-      margin-top: 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
     }
 
     .mini-results {
@@ -128,30 +200,35 @@
     }
 
     .mini-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 16px;
-      background: #fff;
+      border: 1px solid rgba(216, 180, 254, 0.5);
+      border-radius: 20px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 245, 255, 0.95));
+      box-shadow: 0 12px 25px rgba(168, 85, 247, 0.1);
     }
 
     .mini-card p:first-child {
       color: #6b7280;
       margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 0.88rem;
     }
 
     .mini-card p:last-child {
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #6d28d9;
     }
 
     .note {
       margin-top: 20px;
       font-size: 0.95rem;
-      color: #6b7280;
-      line-height: 1.5;
-      border: 1px dashed #d1d5db;
-      border-radius: 12px;
-      padding: 14px;
+      color: #4b5563;
+      line-height: 1.6;
+      border: 1px dashed rgba(124, 58, 237, 0.35);
+      border-radius: 20px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.55);
     }
 
     @media (max-width: 768px) {
@@ -162,6 +239,15 @@
 
       body {
         padding: 18px;
+      }
+
+      .tabs {
+        width: 100%;
+        border-radius: 24px;
+      }
+
+      .tab-button {
+        flex: 1;
       }
     }
   </style>
